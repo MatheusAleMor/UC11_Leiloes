@@ -17,7 +17,7 @@ public class ProdutosDAO {
     public boolean conectar() { // método que vai fazer a conexão com o banco de dados 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/uc11?useSSL=false", "root", "novapasta.");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/uc11?useTimezone=true&serverTimezone=UTC", "root", "novapasta.");
             System.out.println("Conectado");
             return true;
         } catch (ClassNotFoundException | SQLException ex) {
