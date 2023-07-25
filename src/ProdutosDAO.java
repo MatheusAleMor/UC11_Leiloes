@@ -14,7 +14,7 @@ public class ProdutosDAO {
     ResultSet resultset;
     ArrayList<ProdutosDTO> listagem = new ArrayList<>();
 
-    public boolean conectar() { // método que vai fazer a conexão com o banco de dados 
+    public boolean conectar() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/uc11?useTimezone=true&serverTimezone=UTC", "root", "novapasta.");
@@ -26,7 +26,7 @@ public class ProdutosDAO {
         }
     }
 
-    public void desconectar() { // método que vai desconectar do banco de dados 
+    public void desconectar() {
         try {
             conn.close();
             System.out.println("Desconectado!");
@@ -36,7 +36,7 @@ public class ProdutosDAO {
     }
 
     public void cadastrarProduto(ProdutosDTO produto) {
-        
+
         try {
             prep = conn.prepareStatement("INSERT INTO produtos VALUES(0,?,?,?)");
             prep.setString(1, produto.getNome());
