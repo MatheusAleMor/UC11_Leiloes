@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProdutosDAO {
 
@@ -52,9 +53,42 @@ public class ProdutosDAO {
         }
     }
 
-    public ArrayList<ProdutosDTO> listarProdutos() {
+    public void venderProduto(int idProduto) {
+        try {
+            String sql = "UPDATE produtos SET status = 'Vendido' WHERE id = ?";
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setInt(1, idProduto);
+            int rowsUpdated = st.executeUpdate();
 
-        return listagem;
+            if (rowsUpdated > 0) {
+                JOptionPane.showMessageDialog(null, "Produto Vendido com sucesso");
+            } else {
+                JOptionPane.showMessageDialog(null, "Não foi possível vender o produto");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Erro ao conectar: " + ex.getMessage());
+        }
+    }
+    
+    public List<ProdutosDTO> listarProdutos() {
+        String sql = "SELECT * FROM produtos";
+        try {
+            PreparedStatement st = conn.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            List<ProdutosDTO> listaProdutos = new ArrayList<>();
+            while (rs.next()) {
+                ProdutosDTO produto = new ProdutosDTO();
+                produto.setId(rs.getInt("id"));
+                produto.setNome(rs.getString("nome"));
+                produto.setValor(rs.getInt("valor"));
+                produto.setStatus(rs.getString("status"));
+                listaProdutos.add(produto);
+            }
+            return listaProdutos;
+        } catch (SQLException ex) {
+            System.out.println("Erro ao conectar: " + ex.getMessage());
+            return null;
+        }
     }
 
 }
