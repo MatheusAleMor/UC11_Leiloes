@@ -1,12 +1,13 @@
 
-import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class listagemVIEW extends javax.swing.JFrame {
 
     public listagemVIEW() {
         initComponents();
-        listarProdutos();
+        PreencherTbl();
     }
 
     /**
@@ -19,7 +20,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        listaProdutos = new javax.swing.JTable();
+        tabelaProdutos = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -31,7 +32,7 @@ public class listagemVIEW extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        listaProdutos.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaProdutos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -42,7 +43,7 @@ public class listagemVIEW extends javax.swing.JFrame {
                 "ID", "Nome", "Valor", "Status"
             }
         ));
-        jScrollPane1.setViewportView(listaProdutos);
+        jScrollPane1.setViewportView(tabelaProdutos);
 
         jLabel1.setFont(new java.awt.Font("Lucida Fax", 0, 18)); // NOI18N
         jLabel1.setText("Lista de Produtos");
@@ -124,23 +125,65 @@ public class listagemVIEW extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
-        String id = id_produto_venda.getText();
-
-        ProdutosDAO produtosdao = new ProdutosDAO();
-
-        //produtosdao.venderProduto(Integer.parseInt(id));
-        listarProdutos();
+       venderProduto();
+       PreencherTbl();
     }//GEN-LAST:event_btnVenderActionPerformed
 
     private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
-        //vendasVIEW vendas = new vendasVIEW(); 
-        //vendas.setVisible(true);
+        listagemVendidos vendidos = new listagemVendidos();
+        vendidos.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnVendasActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
 
+    private void PreencherTbl() {
+        ProdutosDAO produtosdao = new ProdutosDAO();
+        boolean status = produtosdao.conectar();
+        if (!status) {
+            JOptionPane.showMessageDialog(null, "Erro de conexão");
+        } else {
+            List<ProdutosDTO> listaProdutos = produtosdao.listarProdutos();
+            DefaultTableModel model = (DefaultTableModel) tabelaProdutos.getModel();
+            model.setRowCount(0);
+            for (ProdutosDTO produto : listaProdutos) {
+                Object[] row = new Object[]{
+                    produto.getId(),
+                    produto.getNome(),
+                    produto.getValor(),
+                    produto.getStatus()
+                };
+                model.addRow(row);
+            }
+            produtosdao.desconectar();
+        }
+    }
+
+    private void venderProduto() {
+        String idProdutoTexto = id_produto_venda.getText();
+
+        try {
+            int idProduto = Integer.parseInt(idProdutoTexto);
+            ProdutosDAO produtosDAO = new ProdutosDAO();
+            boolean status = produtosDAO.conectar();
+
+            if (status) {
+                produtosDAO.venderProduto(idProduto);
+                produtosDAO.desconectar();
+            } else {
+                JOptionPane.showMessageDialog(null, "Erro de conexão");
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Digite um ID válido");
+        }
+    }
+
+    public String getIdProdutoVenda() {
+        return id_produto_venda.getText();
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -186,28 +229,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTable listaProdutos;
+    private javax.swing.JTable tabelaProdutos;
     // End of variables declaration//GEN-END:variables
 
-    private void listarProdutos() {
-        try {
-            ProdutosDAO produtosdao = new ProdutosDAO();
-
-            DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
-            model.setNumRows(0);
-
-            ArrayList<ProdutosDTO> listagem = produtosdao.listarProdutos();
-
-            for (int i = 0; i < listagem.size(); i++) {
-                model.addRow(new Object[]{
-                    listagem.get(i).getId(),
-                    listagem.get(i).getNome(),
-                    listagem.get(i).getValor(),
-                    listagem.get(i).getStatus()
-                });
-            }
-        } catch (Exception e) {
-        }
-
-    }
 }
