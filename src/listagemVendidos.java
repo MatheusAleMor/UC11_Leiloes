@@ -1,3 +1,8 @@
+
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -14,6 +19,7 @@ public class listagemVendidos extends javax.swing.JFrame {
      */
     public listagemVendidos() {
         initComponents();
+        PreencherTbl();
     }
 
     /**
@@ -87,9 +93,34 @@ public class listagemVendidos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
-        // TODO add your handling code here:
+        listagemVIEW listagem = new listagemVIEW();
+        listagem.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
 
+    private void PreencherTbl() {
+    ProdutosDAO produtosdao = new ProdutosDAO();
+    boolean status = produtosdao.conectar();
+    if (!status) {
+        JOptionPane.showMessageDialog(null, "Erro de conexão");
+    } else {
+        List<ProdutosDTO> listaProdutos = produtosdao.listarProdutosVendidos();
+        DefaultTableModel model = (DefaultTableModel) tabelaProdutos.getModel();
+        model.setRowCount(0);
+        for (ProdutosDTO produto : listaProdutos) {
+            Object[] row = new Object[]{
+                produto.getId(),
+                produto.getNome(),
+                produto.getValor(),
+                produto.getStatus()
+            };
+            model.addRow(row);
+        }
+        produtosdao.desconectar();
+    
+    }
+    }
+    
     /**
      * @param args the command line arguments
      */
